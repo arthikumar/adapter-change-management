@@ -83,55 +83,6 @@ function get(serviceNowTable, callback) {
 
 }
 
-/**
- * @function post
- * @description Call the ServiceNow POST API.
- *
- * @param {string} serviceNowTable - The table target of the ServiceNow table API.
- * @param {iapCallback} callback - Callback a function.
- * @param {*} callback.data - The API's response. Will be an object if sunnyday path.
- *   Will be HTML text if hibernating instance.
- * @param {error} callback.error - The error property of callback.
- */
-function post(serviceNowTable, callback) {
-
-  // Initialize return arguments for callback
-  let callbackData = null;
-  let callbackError = null;
-
-  // Construct API call to send to ServiceNow
-  const requestOptions = {
-    method: 'POST',
-    auth: {
-      user: options.username,
-      pass: options.password,
-    },
-    baseUrl: options.url,
-    uri: `/api/now/table/${serviceNowTable}`,
-  };
-
-  // Send Request to ServiceNow
-  request(requestOptions, (error, response, body) => {
-    /**
-     * Process ServiceNow error, response and body.
-     * Check error and response code to make sure
-     * response is good.
-     */
-    if (error) {
-      console.error('Error present.');
-      callbackError = error;
-    } else if (!validResponseRegex.test(response.statusCode)) {
-      console.log('Bad response code.');
-      callbackError = response;
-    } else if (response.body.includes('Hibernating Instance')) {
-      callbackData = 'Service Now instance is hibernating';
-    } else {
-      callbackData = response;
-    }
-    return callback(callbackData, callbackError);
-  });
-
-}
 
 // This section is used to call your request and log any errors
 function main() {
@@ -140,12 +91,6 @@ function main() {
       console.error(`\nError returned from GET request:\n${JSON.stringify(error)}`);
     }
     console.log(`\nResponse returned from GET request:\n${JSON.stringify(data)}`)
-  });
-  post('change_request', (data, error) => {
-    if (error) {
-      console.error(`\nError returned from POST request:\n${JSON.stringify(error)}`);
-    }
-    console.log(`\nResponse returned from POST request:\n${JSON.stringify(data)}`)
   });
 }
 
